@@ -2,10 +2,14 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 import sqlite3
+import os
 
 app = FastAPI()
 
-DB_PATH = 'todo.db'
+DB_PATH = os.getenv('DB_PATH', 'todo.db')
+
+# Ensure the directory exists
+os.makedirs(os.path.dirname(DB_PATH) if os.path.dirname(DB_PATH) else '.', exist_ok=True)
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -25,9 +29,12 @@ def init_db():
 init_db()
 
 class Todo(BaseModel):
-    id: int = None
+    id: int | None = None
     title: str
     completed: bool = False
+    
+    class Config:
+        from_attributes = True
 
 @app.get('/todos', response_model=List[Todo])
 def read_todos():

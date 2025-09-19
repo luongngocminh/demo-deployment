@@ -34,6 +34,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
         with:
@@ -44,16 +47,19 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Copy Docker image to server
+      - name: Copy files and Docker image to server
         run: |
+          scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/docker-compose.yml
           scp -o StrictHostKeyChecking=no todo-app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/todo-app.tar.gz
 
       - name: Load and run Docker image on server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            mv ~/docker-compose.yml ${{ secrets.SSH_TARGET_DIR }}/docker-compose.yml &&
             mv ~/todo-app.tar.gz ${{ secrets.SSH_TARGET_DIR }}/todo-app.tar.gz &&
             cd ${{ secrets.SSH_TARGET_DIR }} &&
+            mkdir -p data &&
             docker load -i todo-app.tar.gz &&
             docker compose down &&
-            docker compose up -d --build
+            docker compose up -d
           "
