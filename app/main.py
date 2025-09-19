@@ -1,10 +1,19 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List
 import sqlite3
 import os
 
 app = FastAPI()
+
+# Mount static files
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+
+# Setup templates
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 DB_PATH = os.getenv('DB_PATH', 'todo.db')
 
@@ -35,6 +44,14 @@ class Todo(BaseModel):
     
     class Config:
         from_attributes = True
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "static_files": "mounted"}
 
 @app.get('/todos', response_model=List[Todo])
 def read_todos():
