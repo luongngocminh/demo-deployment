@@ -46,8 +46,14 @@ jobs:
 
       - name: Copy Docker image to server
         run: |
-          scp -o StrictHostKeyChecking=no todo-app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_TARGET_DIR }}/todo-app.tar.gz
+          scp -o StrictHostKeyChecking=no todo-app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/todo-app.tar.gz
 
       - name: Load and run Docker image on server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_TARGET_DIR }} && docker load -i todo-app.tar.gz && docker-compose down && docker-compose up -d --build"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            mv ~/todo-app.tar.gz ${{ secrets.SSH_TARGET_DIR }}/todo-app.tar.gz &&
+            cd ${{ secrets.SSH_TARGET_DIR }} &&
+            docker load -i todo-app.tar.gz &&
+            docker-compose down &&
+            docker-compose up -d --build
+          "
