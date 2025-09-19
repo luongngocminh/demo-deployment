@@ -1,0 +1,8 @@
+- [x] Clarify Project Requirements: FastAPI, SQLite, Docker Compose, GitHub Actions SSH deploy
+- [x] Scaffold the Project: FastAPI CRUD, SQLite, Dockerfile, docker-compose.yml
+- [x] Customize the Project: Basic todo CRUD, deployment workflow
+- [x] Install Required Extensions: None needed
+- [x] Compile the Project: Use Docker Compose
+- [x] Create and Run Task: Use Docker Compose up
+- [x] Launch the Project: Access via http://localhost:8000/docs
+- [x] Ensure Documentation is Complete: See README.md
