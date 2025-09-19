@@ -54,6 +54,6 @@ jobs:
             mv ~/todo-app.tar.gz ${{ secrets.SSH_TARGET_DIR }}/todo-app.tar.gz &&
             cd ${{ secrets.SSH_TARGET_DIR }} &&
             docker load -i todo-app.tar.gz &&
-            docker-compose down &&
-            docker-compose up -d --build
+            docker compose down &&
+            docker compose up -d --build
           "
